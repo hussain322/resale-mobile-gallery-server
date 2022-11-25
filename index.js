@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("resale server is running");
+  res.send("resale server is running...");
 });
 
 app.listen(port, () => {
