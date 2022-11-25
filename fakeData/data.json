@@ -1,0 +1,32 @@
+[
+  {
+    "category_id": "01",
+    "category_name": "Resale iPhone Gallery",
+    "img": "https://i.ibb.co/fppcQDM/Iphone.jpg"
+  },
+  {
+    "category_id": "02",
+    "category_name": "Resale Samsung Mobile Gallery",
+    "img": "https://i.ibb.co/PWZZyjT/Samsung.jpg"
+  },
+  {
+    "category_id": "03",
+    "category_name": "Resale Oppo Mobile Gallery",
+    "img": "https://i.ibb.co/QdvmmHr/Oppo.jpg"
+  },
+  {
+    "category_id": "04",
+    "category_name": "Resale Xiaomi Mobile Gallery",
+    "img": "https://i.ibb.co/y8H6K1c/Xiomi.jpg"
+  },
+  {
+    "category_id": "05",
+    "category_name": "Resale OnePlus Mobile Gallery",
+    "img": "https://i.ibb.co/jyYmh5c/Oneplus.jpg"
+  },
+  {
+    "category_id": "06",
+    "category_name": "Resale Google Pixels Gallery",
+    "img": "https://i.ibb.co/pZyQBhs/Google-Pixel-2.jpg"
+  }
+]
