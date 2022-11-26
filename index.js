@@ -23,10 +23,17 @@ async function run() {
     const categoryCollection = client
       .db("resaleMarket")
       .collection("categories");
+    const phonesCollection = client.db("resaleMarket").collection("phones");
 
     app.get("/categories", async (req, res) => {
       const query = {};
       const options = await categoryCollection.find(query).toArray();
+      res.send(options);
+    });
+
+    app.get("/phones", async (req, res) => {
+      const query = {};
+      const options = await phonesCollection.find(query).toArray();
       res.send(options);
     });
   } finally {
