@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 
 require("dotenv").config();
@@ -31,10 +31,29 @@ async function run() {
       res.send(options);
     });
 
+    app.get("/category/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const category = await categoryCollection.findOne(query);
+      res.send(category);
+      // const query = await phonesCollection.filter(
+      //   (phone) => phone.category_id === id
+      // );
+      // const categoryPhone = categoryCollection.find(query);
+      // res.send(categoryPhone);
+    });
+
     app.get("/phones", async (req, res) => {
       const query = {};
       const options = await phonesCollection.find(query).toArray();
       res.send(options);
+    });
+
+    app.get("/phones/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const phone = await phonesCollection.findOne(query);
+      res.send(phone);
     });
   } finally {
   }
