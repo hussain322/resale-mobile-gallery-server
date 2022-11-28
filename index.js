@@ -31,6 +31,9 @@ async function run() {
     //Bookings Collection
     const bookingsCollection = client.db("resaleMarket").collection("bookings");
 
+    //Bookings Collection
+    const usersCollection = client.db("resaleMarket").collection("users");
+
     //GET Method
     //Categories api
     app.get("/categories", async (req, res) => {
@@ -63,18 +66,26 @@ async function run() {
     });
 
     //Create Api by using Email
-    app.get("/phones", async (req, res) => {
-      let query = {};
+    app.get("/addProduct", async (req, res) => {
       console.log(req.query);
-      if (req.query.email) {
-        query = {
-          email: req.query.email,
-        };
-      }
-      const options = { sort: { createdTime: -1 } };
-      const cursor = phonesCollection.find(query, options);
-      const phones = await cursor.toArray();
+      const email = req.query.email;
+      const query = { email: email };
+      // const options = { sort: { createdTime: -1 } };
+      // const cursor = phonesCollection.find(query, options);
+      // const phones = await cursor.toArray();
+      const phones = await phonesCollection.find(query).toArray();
       res.send(phones);
+    });
+
+    app.get("/bookings", async (req, res) => {
+      console.log(req.query);
+      const email = req.query.email;
+      const query = { email: email };
+      // const options = { sort: { createdTime: -1 } };
+      // const cursor = phonesCollection.find(query, options);
+      // const phones = await cursor.toArray();
+      const bookings = await bookingsCollection.find(query).toArray();
+      res.send(bookings);
     });
 
     //POST Method
@@ -89,6 +100,12 @@ async function run() {
     app.post("/bookings", async (req, res) => {
       const booking = req.body;
       const result = await bookingsCollection.insertOne(booking);
+      res.send(result);
+    });
+
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
       res.send(result);
     });
   } finally {
