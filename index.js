@@ -20,40 +20,76 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    //Category Collection
     const categoryCollection = client
       .db("resaleMarket")
       .collection("categories");
+
+    //Phones Collection
     const phonesCollection = client.db("resaleMarket").collection("phones");
 
+    //Bookings Collection
+    const bookingsCollection = client.db("resaleMarket").collection("bookings");
+
+    //GET Method
+    //Categories api
     app.get("/categories", async (req, res) => {
       const query = {};
       const options = await categoryCollection.find(query).toArray();
       res.send(options);
     });
 
+    //Category api Id
     app.get("/category/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const category = await categoryCollection.findOne(query);
       res.send(category);
-      // const query = await phonesCollection.filter(
-      //   (phone) => phone.category_id === id
-      // );
-      // const categoryPhone = categoryCollection.find(query);
-      // res.send(categoryPhone);
     });
 
+    //All Phones api
     app.get("/phones", async (req, res) => {
       const query = {};
       const options = await phonesCollection.find(query).toArray();
       res.send(options);
     });
 
+    //single phone api by id
     app.get("/phones/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const phone = await phonesCollection.findOne(query);
       res.send(phone);
+    });
+
+    //Create Api by using Email
+    app.get("/phones", async (req, res) => {
+      let query = {};
+      console.log(req.query);
+      if (req.query.email) {
+        query = {
+          email: req.query.email,
+        };
+      }
+      const options = { sort: { createdTime: -1 } };
+      const cursor = phonesCollection.find(query, options);
+      const phones = await cursor.toArray();
+      res.send(phones);
+    });
+
+    //POST Method
+    //Add a product api
+    app.post("/addProduct", async (req, res) => {
+      const product = req.body;
+      const result = await phonesCollection.insertOne(product);
+      res.send(result);
+    });
+
+    //Bookings Post
+    app.post("/bookings", async (req, res) => {
+      const booking = req.body;
+      const result = await bookingsCollection.insertOne(booking);
+      res.send(result);
     });
   } finally {
   }
