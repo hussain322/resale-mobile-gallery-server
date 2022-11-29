@@ -180,6 +180,14 @@ async function run() {
       );
       res.send(result);
     });
+
+    //Delete Method api
+    app.delete("/sellers/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await usersCollection.deleteOne(filter);
+      res.send(result);
+    });
   } finally {
   }
 }
