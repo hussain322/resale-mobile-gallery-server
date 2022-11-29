@@ -110,11 +110,36 @@ async function run() {
       const user = await usersCollection.findOne(query);
       if (user) {
         const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, {
-          expiresIn: "1h",
+          expiresIn: "24h",
         });
         res.send({ accessToken: token });
       }
       res.status(401).send({ accessToken: "" });
+    });
+
+    // All users api
+    app.get("/users", async (req, res) => {
+      const query = {};
+      const result = await usersCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //All sellers api
+    app.get("/sellers", async (req, res) => {
+      const query = {};
+      const result = await usersCollection
+        .find({ category: "Seller" })
+        .toArray();
+      res.send(result);
+    });
+
+    //All buyers api
+    app.get("/buyers", async (req, res) => {
+      const query = {};
+      const result = await usersCollection
+        .find({ category: "Buyer" })
+        .toArray();
+      res.send(result);
     });
 
     //POST Method
@@ -135,6 +160,24 @@ async function run() {
     app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+
+    //Admin Api
+    app.put("/users/admin/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          role: "admin",
+        },
+      };
+      const result = await usersCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
       res.send(result);
     });
   } finally {
