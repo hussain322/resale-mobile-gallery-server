@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
-
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const app = express();
 
@@ -17,6 +17,24 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
+
+//Jwt middle ware function
+function verifyJWT(req, res, next) {
+  console.log("token inside verify jwt", req.headers.authorization);
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    res.status(401).send("unauthorized access");
+  }
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+    if (err) {
+      return res.status(403).send({ message: "forbidden access" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+}
 
 async function run() {
   try {
@@ -70,22 +88,33 @@ async function run() {
       console.log(req.query);
       const email = req.query.email;
       const query = { email: email };
-      // const options = { sort: { createdTime: -1 } };
-      // const cursor = phonesCollection.find(query, options);
-      // const phones = await cursor.toArray();
       const phones = await phonesCollection.find(query).toArray();
       res.send(phones);
     });
 
-    app.get("/bookings", async (req, res) => {
-      console.log(req.query);
+    app.get("/bookings", verifyJWT, async (req, res) => {
       const email = req.query.email;
+      const decodedEmail = req.decoded.email;
+      if (email !== decodedEmail) {
+        return res.status(403).send({ message: "forbidden access" });
+      }
       const query = { email: email };
-      // const options = { sort: { createdTime: -1 } };
-      // const cursor = phonesCollection.find(query, options);
-      // const phones = await cursor.toArray();
       const bookings = await bookingsCollection.find(query).toArray();
       res.send(bookings);
+    });
+
+    //Jwt api
+    app.get("/jwt", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      if (user) {
+        const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, {
+          expiresIn: "1h",
+        });
+        res.send({ accessToken: token });
+      }
+      res.status(401).send({ accessToken: "" });
     });
 
     //POST Method
