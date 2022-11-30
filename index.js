@@ -145,6 +145,15 @@ async function run() {
       res.status(403).send({ accessToken: "" });
     });
 
+    //Make admin api using get method by id
+    app.get("/users/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      console.log(user);
+      res.send({ isAdmin: user?.role === "admin" });
+    });
+
     //POST Method
     //Add a product api
     app.post("/addProduct", async (req, res) => {
