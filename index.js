@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.z4ltr6s.mongodb.net/?retryWrites=true&w=majority`;
-console.log(uri);
+// console.log(uri);
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -21,7 +21,7 @@ const client = new MongoClient(uri, {
 
 // Verify jwt function
 function verifyJWT(req, res, next) {
-  console.log("token inside function", req.headers.authorization);
+  // console.log("token inside function", req.headers.authorization);
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).send("unauthorized access");
@@ -85,7 +85,7 @@ async function run() {
 
     //Create Api by using Email
     app.get("/addProduct", async (req, res) => {
-      console.log(req.query);
+      // console.log(req.query);
       const email = req.query.email;
       const query = { email: email };
       const phones = await phonesCollection.find(query).toArray();
@@ -141,7 +141,7 @@ async function run() {
         });
         return res.send({ accessToken: token });
       }
-      console.log(user);
+      // console.log(user);
       res.status(403).send({ accessToken: "" });
     });
 
@@ -150,8 +150,17 @@ async function run() {
       const email = req.params.email;
       const query = { email: email };
       const user = await usersCollection.findOne(query);
-      console.log(user);
+      // console.log(user);
       res.send({ isAdmin: user?.role === "admin" });
+    });
+
+    //Make seller api using get method by id
+    app.get("/users/seller/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      // console.log(user);
+      res.send({ isSeller: user?.category === "Seller" });
     });
 
     //POST Method
@@ -192,6 +201,32 @@ async function run() {
       const updatedDoc = {
         $set: {
           role: "admin",
+        },
+      };
+      const result = await usersCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(result);
+    });
+
+    // Seller verify status api using put method
+    app.put("/users/sellerVerify/:id", verifyJWT, async (req, res) => {
+      const decodedEmail = req.decoded.email;
+      const query = { email: decodedEmail };
+      const user = await usersCollection.findOne(query);
+
+      if (user?.role !== "admin") {
+        return res.status(403).send({ message: "forbidden access" });
+      }
+
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          status: "Verified",
         },
       };
       const result = await usersCollection.updateOne(
