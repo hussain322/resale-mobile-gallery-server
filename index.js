@@ -163,6 +163,15 @@ async function run() {
       res.send({ isSeller: user?.category === "Seller" });
     });
 
+    //Make seller api using get method by id
+    app.get("/users/buyer/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      // console.log(user);
+      res.send({ isBuyer: user?.category === "Buyer" });
+    });
+
     //POST Method
     //Add a product api
     app.post("/addProduct", async (req, res) => {
@@ -237,8 +246,24 @@ async function run() {
       res.send(result);
     });
 
-    //Delete Method api
+    //Delete Method api by Sellers
     app.delete("/sellers/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await usersCollection.deleteOne(filter);
+      res.send(result);
+    });
+
+    // delete api for users
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await usersCollection.deleteOne(filter);
+      res.send(result);
+    });
+
+    // delete api for buyers
+    app.delete("/buyers/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
       const result = await usersCollection.deleteOne(filter);
